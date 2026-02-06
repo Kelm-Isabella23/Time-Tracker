@@ -1,0 +1,28 @@
+/* Grundlayout für die Druckseite */
+
+.page {
+  font-family: Arial, sans-serif;
+}
+
+.page h1 {
+  margin-top: 0;
+}
+
+/* Tabelle für die Zeitübersicht */
+.page table {
+  width: 100%;
+  border-collapse: collapse; /* Verhindert doppelte Rahmenlinien */
+  margin-top: 10mm;
+}
+
+/* Tabellenkopf- und Tabellenzellen */
+.page th,
+.page td {
+  border: 1px solid #000;
+  padding: 6px; /* Innenabstand für bessere Lesbarkeit */
+}
+
+/* Container für Druck-/Navigationsbuttons */
+.print-actions {
+  margin-bottom: 12px;
+}
