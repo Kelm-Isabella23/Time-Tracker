@@ -1,0 +1,159 @@
+{# Erweitert das Basislayout (Navigation, CSS, Messages) #}
+{% extends "base.html" %}
+
+{# Hauptinhalt der Seite #}
+{% block content %}
+
+{# Zwei-Spalten-Layout: links Übersicht, rechts Aktionen #}
+<div class="grid grid-2">
+
+  {# =========================
+     Linke Spalte: Statistik/Übersicht
+     Variablen: total_all, rows (kommen aus dashboard-view)
+     ========================= #}
+  <div class="card">
+    <h1>Meine Übersicht</h1>
+
+    {# KPI-Boxen (Gesamtzeit + Druckbericht) #}
+    <div class="kpi">
+      <div class="box">
+        <div class="label">Gesamtzeit</div>
+        <div class="big">{{ total_all }}</div>
+        <div class="muted">Minuten</div>
+      </div>
+
+      <div class="box">
+        <div class="label">Druckbericht</div>
+        {# Öffnet die Druckansicht in einem neuen Tab (DIN A4) #}
+        <a class="btn btn-link" href="{% url 'print_report' %}" target="_blank">
+          🖨️ DIN A4 öffnen
+        </a>
+      </div>
+    </div>
+
+    <hr class="sep">
+
+    {# Wenn noch keine Zeiten erfasst wurden #}
+    {% if total_all == 0 %}
+      <p class="muted">Noch keine Berichte vorhanden.</p>
+    {% else %}
+      {# Tabelle: Minuten & Anteil je Modul (rows kommt aus get_module_stats) #}
+      <table class="table">
+        <tr>
+          <th>Modul</th>
+          <th>Minuten</th>
+          <th>Anteil (%)</th>
+        </tr>
+
+        {# Iteration über Statistikzeilen #}
+        {% for r in rows %}
+          <tr>
+            <td>{{ r.module }}</td>
+            <td>{{ r.minutes }}</td>
+            <td>{{ r.percent }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% endif %}
+  </div>
+
+  {# =========================
+     Rechte Spalte: Aktionen je Rolle
+     Rolle wird über user.profile.role geprüft
+     ========================= #}
+  <div class="card">
+    <h2>Aktionen</h2>
+
+    {# -------------------------
+       USER: kann VIP beantragen
+       ------------------------- #}
+    {% if user.profile.role == "USER" %}
+      <form method="post" action="{% url 'request_vip' %}">
+        {# CSRF-Schutz für Formular-POST #}
+        {% csrf_token %}
+        <button class="btn btn-primary" type="submit">VIP beantragen</button>
+      </form>
+
+      <p class="muted" style="margin-top:10px;">
+        VIP erlaubt Export/Import (JSON/CSV/XML).
+      </p>
+
+    {# -------------------------
+       VIP: kann Admin beantragen + Export/Import nutzen
+       ------------------------- #}
+    {% elif user.profile.role == "VIP" %}
+      <form method="post" action="{% url 'request_admin' %}">
+        {% csrf_token %}
+        <button class="btn btn-primary" type="submit">Administrator beantragen</button>
+      </form>
+
+      <hr class="sep">
+      <h3>VIP-Funktionen</h3>
+
+      {# Export-Links als Include ausgelagert #}
+      <p class="muted">Export:</p>
+      {% include "includes/vip_export_links.html" %}
+
+      <hr class="sep">
+
+      {# Import: Datei-Upload, überschreibt bestehende Reports #}
+      <form method="post" action="{% url 'vip_import' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-row">
+          <label>Import (überschreibt alle Reports)</label>
+          <select name="format">
+            <option value="json">JSON</option>
+            <option value="csv">CSV</option>
+            <option value="xml">XML</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <input type="file" name="file" required>
+        </div>
+
+        <button class="btn btn-danger" type="submit">Importieren</button>
+      </form>
+
+    {# -------------------------
+       ADMIN: Admin-Bereich + VIP-Funktionen
+       ------------------------- #}
+    {% elif user.profile.role == "ADMIN" %}
+      <div class="actions">
+        <a class="btn btn-link" href="{% url 'admin_requests' %}">Admin: Anträge</a>
+        <a class="btn btn-link" href="{% url 'admin_users' %}">Admin: Benutzer</a>
+      </div>
+
+      <hr class="sep">
+      <h3>VIP-Funktionen</h3>
+
+      <p class="muted">Export:</p>
+      {% include "includes/vip_export_links.html" %}
+
+      <hr class="sep">
+
+      <form method="post" action="{% url 'vip_import' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-row">
+          <label>Import (überschreibt alle Reports)</label>
+          <select name="format">
+            <option value="json">JSON</option>
+            <option value="csv">CSV</option>
+            <option value="xml">XML</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <input type="file" name="file" required>
+        </div>
+
+        <button class="btn btn-danger" type="submit">Importieren</button>
+      </form>
+    {% endif %}
+  </div>
+
+</div>
+
+{% endblock %}
