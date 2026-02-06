@@ -1,36 +1,36 @@
-{# Erweitert das zentrale Basis-Layout #}
+<!--Erweitert das zentrale Basis-Layout-->
 {% extends "base.html" %}
 
-{# Hauptinhalt der Seite #}
+<!--Hauptinhalt der Seite-->
 {% block content %}
 
-{# Registrierungsformular, zentriert und in begrenzter Breite #}
+<!--Registrierungsformular, zentriert und in begrenzter Breite-->
 <div class="card" style="max-width:520px; margin: 0 auto;">
   <h1>Registrieren</h1>
 
-  {# Kurze Information zum Startstatus des Nutzers #}
+  <!--Kurze Information zum Startstatus des Nutzers-->
   <p class="muted">
     Erstelle einen Account. Du startest als normaler Anwender.
   </p>
 
-  {# Registrierungsformular #}
+  <!--Registrierungsformular-->
   <form method="post">
-    {# CSRF-Schutz für das Formular #}
+    <!--CSRF-Schutz für das Formular-->
     {% csrf_token %}
 
-    {# Benutzername #}
+    <!--Benutzername-->
     <div class="form-row">
       <label>Benutzername</label>
       <input name="username" autocomplete="username">
     </div>
 
-    {# Passwort #}
+    <!--Passwort-->
     <div class="form-row">
       <label>Passwort</label>
       <input name="password" type="password" autocomplete="new-password">
     </div>
 
-    {# Aktionen: Account anlegen oder zurück zum Login #}
+    <!--Aktionen: Account anlegen oder zurück zum Login-->
     <div class="actions">
       <button class="btn btn-primary" type="submit">
         Account erstellen
